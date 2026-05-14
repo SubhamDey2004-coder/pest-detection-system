@@ -1,0 +1,82 @@
+{
+  "fungal_disease": {
+    "symptoms": [
+      "leaf spots",
+      "powdery patches",
+      "yellowing",
+      "fungal growth"
+    ],
+    "damage": "Fungal diseases reduce photosynthesis and weaken crops.",
+    "solutions": [
+      "Apply appropriate fungicides",
+      "Remove infected leaves",
+      "Avoid excess moisture",
+      "Improve air circulation"
+    ]
+  },
+
+  "bacterial_disease": {
+    "symptoms": [
+      "water-soaked lesions",
+      "yellow halos",
+      "wilting"
+    ],
+    "damage": "Bacterial infections can spread rapidly and reduce crop yield.",
+    "solutions": [
+      "Use copper-based bactericides",
+      "Avoid overhead irrigation",
+      "Remove infected plants"
+    ]
+  },
+
+  "viral_disease": {
+    "symptoms": [
+      "leaf curling",
+      "mosaic patterns",
+      "stunted growth"
+    ],
+    "damage": "Viral diseases severely affect plant growth and productivity.",
+    "solutions": [
+      "Control insect vectors",
+      "Remove infected plants",
+      "Use resistant crop varieties"
+    ]
+  },
+
+  "pest_damage": {
+    "symptoms": [
+      "holes in leaves",
+      "chewed edges",
+      "visible insects"
+    ],
+    "damage": "Pests feed on plant tissues and reduce crop health.",
+    "solutions": [
+      "Use biological pesticides",
+      "Apply neem oil",
+      "Monitor crops regularly"
+    ]
+  },
+
+  "rust_disease": {
+    "symptoms": [
+      "orange or brown rust spots",
+      "powdery pustules"
+    ],
+    "damage": "Rust diseases reduce photosynthesis and weaken crops.",
+    "solutions": [
+      "Apply fungicides",
+      "Use resistant crop varieties",
+      "Remove infected leaves"
+    ]
+  },
+
+  "healthy": {
+    "symptoms": [
+      "healthy green leaves"
+    ],
+    "damage": "No damage detected.",
+    "solutions": [
+      "Continue regular crop monitoring"
+    ]
+  }
+}
