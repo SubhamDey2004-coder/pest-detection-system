@@ -25,7 +25,7 @@ model.classifier[1] = nn.Linear(num_features, len(CLASS_NAMES))
 # get absolute path to project root
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-MODEL_PATH = os.path.join(BASE_DIR, "ml-model", "saved_model", "pest_model_v2.pth")
+MODEL_PATH = os.path.join(BASE_DIR, "ml-model", "saved_model", "pest_model_v3.pth")
 
 
 # Load trained weights

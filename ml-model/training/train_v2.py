@@ -24,23 +24,45 @@ VAL_DIR = os.path.join(DATA_DIR, "val")
 # =========================
 
 train_transform = transforms.Compose([
+
     transforms.Resize((224, 224)),
+
+    # Flip images randomly
     transforms.RandomHorizontalFlip(),
+
+    # Random rotation
     transforms.RandomRotation(20),
 
+    # -------------------------
+    # BLACK & WHITE AUGMENTATION
+    # -------------------------
+    # 25% images become grayscale
+    transforms.RandomGrayscale(p=0.25),
+
+    # -------------------------
+    # NIGHT / LOW LIGHT SIMULATION
+    # -------------------------
     transforms.ColorJitter(
-        brightness=0.3,
+        brightness=0.15,
         contrast=0.3,
         saturation=0.3
     ),
 
+    # Slight image movement
     transforms.RandomAffine(
         degrees=0,
         translate=(0.1, 0.1),
         scale=(0.9, 1.1)
     ),
 
+    # Slight blur
     transforms.GaussianBlur(kernel_size=3),
+
+    # Simulate camera blur/noise
+    transforms.RandomAdjustSharpness(
+        sharpness_factor=0.5,
+        p=0.3
+    ),
 
     transforms.ToTensor()
 ])
@@ -139,7 +161,7 @@ optimizer = optim.Adam(
 # TRAINING LOOP
 # =========================
 
-EPOCHS = 12
+EPOCHS = 5
 
 best_accuracy = 0
 
@@ -214,7 +236,7 @@ for epoch in range(EPOCHS):
 
         torch.save(
             model.state_dict(),
-            "../saved_model/pest_model_v2.pth"
+            "../saved_model/pest_model_v3.pth"
         )
 
         print("💾 Best model updated!")
