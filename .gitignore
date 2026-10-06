@@ -1,16 +1,20 @@
-# Virtual Environment
+# Virtual environments
+.venv/
 venv/
 
 # Python cache
 __pycache__/
-*.pyc
+*.py[cod]
 
-# Dataset folders
+# Local datasets and generated training data
 data/
 
-# VS Code
-.vscode/
+# Local model artifacts not intentionally committed
+*.pt
+*.pth
 
-# OS files
+# IDE / OS files
+.vscode/
+.idea/
 .DS_Store
 Thumbs.db
