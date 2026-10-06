@@ -1,28 +1,45 @@
-# 🌱 AI-Powered Pest & Crop Disease Detection System
+# AI-Powered Pest & Crop Disease Detection System
 
-An AI-based agricultural disease analysis system that detects crop diseases and pest-related damage from uploaded crop images and provides treatment recommendations.
+An image-based agricultural AI system that classifies crop disease and pest-related damage and exposes the trained model through a FastAPI inference API.
 
-Built using **FastAPI**, **PyTorch**, and **Transfer Learning with MobileNetV2**.
+## Problem
 
----
+Crop disease identification can be difficult to perform consistently from visual symptoms alone. This project explores an end-to-end computer-vision workflow from image preprocessing and transfer learning to API-based inference.
 
-# 🚀 Features
+## System Flow
 
-- 🌾 Multi-crop disease classification
-- 🧠 Transfer learning using MobileNetV2
-- 📸 Image upload API
-- 📊 Confidence-aware predictions
-- 🔍 Top-2 prediction analysis
-- 🦠 Generalized disease categorization
-- 💡 AI-generated treatment recommendations
-- ⚡ FastAPI backend with Swagger documentation
-- 🌍 Real-world image augmentation support
+```text
+Crop Image
+    ↓
+Image Preprocessing
+    ↓
+MobileNetV2 Transfer-Learning Model
+    ↓
+Disease / Damage Classification
+    ↓
+Confidence & Top Predictions
+    ↓
+Symptoms / Treatment Information
+    ↓
+FastAPI Response
+```
 
----
+## Highlights
 
-# 🧠 Disease Categories
+- Multi-category crop disease and pest-damage classification
+- Transfer learning with MobileNetV2
+- Fine-tuning on approximately 14K training images
+- Validation accuracy: **86.41%**
+- Image upload inference API
+- Confidence-aware predictions
+- Top-2 prediction output
+- Structured symptom, damage, and treatment information
+- FastAPI backend with Swagger/OpenAPI documentation
+- Data augmentation for more realistic image variation
 
-The model classifies crop images into the following categories:
+## Model Categories
+
+The current application works with categories including:
 
 - Healthy
 - Fungal Disease
@@ -31,91 +48,53 @@ The model classifies crop images into the following categories:
 - Pest Damage
 - Rust Disease
 
----
+## Datasets
 
-# 🛠 Tech Stack
+Training used agricultural image datasets including PlantVillage and a multi-class crop-disease dataset.
 
-- Python
-- FastAPI
-- PyTorch
-- TorchVision
-- MobileNetV2
-- PIL
-- Uvicorn
+The repository does not reproduce third-party dataset ownership. Dataset acquisition instructions should be followed according to the original dataset licenses and terms.
 
----
+## Tech Stack
 
-# 📂 Project Structure
+| Component | Technology |
+|---|---|
+| Language | Python |
+| Deep learning | PyTorch |
+| Computer vision | TorchVision, PIL |
+| Model | MobileNetV2 |
+| Backend | FastAPI |
+| Server | Uvicorn |
 
-```plaintext
+## Project Structure
+
+```text
 pest-detection-system/
-│
 ├── backend/
 │   ├── api/
 │   ├── services/
 │   ├── knowledge-base/
 │   └── main.py
-│
 ├── ml-model/
 │   ├── training/
 │   └── saved_model/
-│
-├── data/
-│
+├── PlantVillageDataset/
+├── plant-village-dataset/
 ├── requirements.txt
-├── README.md
-└── .gitignore
+├── .gitignore
+└── README.md
 ```
 
----
+## API
 
-# 📊 Model Training
-
-The model was trained using:
-
-- PlantVillage Dataset
-- 20k Multi-Class Crop Disease Dataset
-
-Datasets:
-
-- [PlantVillage Dataset](https://www.kaggle.com/datasets/emmarex/plantdisease?utm_source=chatgpt.com)
-- [20k Multi-Class Crop Disease Dataset](https://www.kaggle.com/datasets/jawadali1045/20k-multi-class-crop-disease-images?utm_source=chatgpt.com)
-
----
-
-# 🧪 Training Details
-
-- Transfer Learning using MobileNetV2
-- Fine-tuned on ~14k training images
-- Validation Accuracy: **86.41%**
-- Real-world augmentation:
-  - Rotation
-  - Blur
-  - Color Jitter
-  - Translation
-  - Horizontal Flip
-
----
-
-# ⚙ API Endpoint
-
-## Predict Disease
+### Predict Disease
 
 ```http
 POST /predict
 ```
 
-Upload a crop image and receive:
-- predicted disease category
-- confidence score
-- top-2 predictions
-- symptoms
-- damage description
-- treatment recommendations
+The inference endpoint accepts a crop image and returns the predicted category, confidence, top predictions, and supporting symptom/treatment information.
 
----
-
-# 📄 Example Response
+Example response shape:
 
 ```json
 {
@@ -123,55 +102,34 @@ Upload a crop image and receive:
   "prediction": {
     "pest": "Viral_disease",
     "confidence": 92.41,
-    "warning": null,
     "top_predictions": [
-      {
-        "class": "Viral_disease",
-        "confidence": 92.41
-      },
-      {
-        "class": "Rust_disease",
-        "confidence": 5.82
-      }
-    ],
-    "symptoms": [
-      "leaf curling",
-      "mosaic patterns"
-    ],
-    "damage": "Viral diseases severely affect plant growth and productivity.",
-    "solutions": [
-      "Control insect vectors",
-      "Remove infected plants",
-      "Use resistant crop varieties"
+      {"class": "Viral_disease", "confidence": 92.41},
+      {"class": "Rust_disease", "confidence": 5.82}
     ]
   }
 }
 ```
 
----
+## Engineering Focus
 
-# 🧠 AI Engineering Highlights
+This project demonstrates:
 
-- Unified disease abstraction instead of crop-specific memorization
-- Confidence-aware AI predictions
-- Transfer learning with fine-tuning
-- Multi-dataset integration
-- Robust real-world augmentation pipeline
+- Transfer learning and fine-tuning
+- Image augmentation
+- Model inference packaging
+- Confidence-aware prediction
+- Serving a deep-learning model through a REST API
+- Separation of model, backend, and knowledge-base components
 
----
+## Future Improvements
 
-# 🚀 Future Improvements
+- Grad-CAM explainability
+- Better out-of-distribution evaluation
+- Object detection for localized symptoms
+- Mobile deployment
+- Multilingual farmer support
+- Real-world field-image evaluation
 
-- Grad-CAM Explainable AI
-- Object Detection (YOLO)
-- Mobile App Integration
-- Multilingual Farmer Support
-- Real-Time Disease Detection
+## Author
 
----
-
-# 👨‍💻 Author
-
-Subham Dey
-
----
+**Subham Dey**
