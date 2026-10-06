@@ -1,114 +1,60 @@
-import pandas as pd
-from thefuzz import process
 import os
 
-# =========================
-# LOAD CSV
-# =========================
+import pandas as pd
+from thefuzz import process
 
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
 
-CSV_PATH = os.path.join(
-    BASE_DIR,
-    "data",
-    "pesticide",
-    "Pesticides.csv"
-)
-
-df = pd.read_csv(CSV_PATH)
-
-# =========================
-# CLASS → KEYWORD MAPPING
-# =========================
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+CSV_PATH = os.path.join(BASE_DIR, "data", "pesticide", "Pesticides.csv")
 
 PEST_TYPE_MAPPING = {
-
-    "Pest_damage": [
-        "aphid",
-        "army worm",
-        "bollworm",
-        "whitefly",
-        "mite",
-        "stem borer"
-    ],
-
-    "Fungal_disease": [
-        "rust",
-        "blast",
-        "smut",
-        "wilt",
-        "leaf spot"
-    ],
-
-    "Bacterial_disease": [
-        "bacterial blight"
-    ],
-
-    "Viral_disease": [
-        "mosaic",
-        "leaf curl"
-    ],
-
-    "Rust_disease": [
-        "rust"
-    ],
-
-    "Healthy": []
+    "Pest_damage": ["aphid", "army worm", "bollworm", "whitefly", "mite", "stem borer"],
+    "Fungal_disease": ["rust", "blast", "smut", "wilt", "leaf spot"],
+    "Bacterial_disease": ["bacterial blight"],
+    "Viral_disease": ["mosaic", "leaf curl"],
+    "Rust_disease": ["rust"],
+    "Healthy": [],
 }
 
 
-# =========================
-# FUZZY SEARCH FUNCTION
-# =========================
+def _load_pesticide_data():
+    if not os.path.exists(CSV_PATH):
+        return None
+    return pd.read_csv(CSV_PATH)
+
+
+df = _load_pesticide_data()
+
 
 def search_pesticides(keyword, threshold=70):
+    if df is None or "Pest Name" not in df.columns:
+        return []
 
     pest_names = df["Pest Name"].dropna().astype(str).tolist()
-
-    best_match = process.extractOne(
-        keyword,
-        pest_names,
-        score_cutoff=threshold
-    )
+    best_match = process.extractOne(keyword, pest_names, score_cutoff=threshold)
 
     if not best_match:
         return []
 
     matched_name = best_match[0]
-
     rows = df[df["Pest Name"] == matched_name]
 
-    recommendations = rows[
-        "Most Commonly Used Pesticides"
-    ].dropna().astype(str).tolist()
+    if "Most Commonly Used Pesticides" not in rows.columns:
+        return []
 
-    # Remove duplicates
-    recommendations = list(set(recommendations))
-
-    return recommendations
-
-
-# =========================
-# MAIN RECOMMENDER
-# =========================
-
-def recommend_pesticides(predicted_class):
-
-    recommendations = []
-
-    keywords = PEST_TYPE_MAPPING.get(
-        predicted_class,
-        []
+    return (
+        rows["Most Commonly Used Pesticides"]
+        .dropna()
+        .astype(str)
+        .drop_duplicates()
+        .tolist()
     )
 
-    for keyword in keywords:
 
-        results = search_pesticides(keyword)
+def recommend_pesticides(predicted_class):
+    recommendations = []
 
-        recommendations.extend(results)
+    for keyword in PEST_TYPE_MAPPING.get(predicted_class, []):
+        recommendations.extend(search_pesticides(keyword))
 
-    # Remove duplicates
-    recommendations = list(set(recommendations))
-
-    # Return top 5 only
-    return recommendations[:5]
+    return list(dict.fromkeys(recommendations))[:5]
