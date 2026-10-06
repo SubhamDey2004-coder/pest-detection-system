@@ -1,134 +1,178 @@
 # AI-Powered Pest & Crop Disease Detection System
 
-An image-based agricultural AI system that classifies crop disease and pest-related damage and exposes the trained model through a FastAPI inference API.
+An image-based agricultural computer-vision system that classifies crop disease and pest-related damage and serves predictions through a FastAPI API.
 
-## Problem
+## What it does
 
-Crop disease identification can be difficult to perform consistently from visual symptoms alone. This project explores an end-to-end computer-vision workflow from image preprocessing and transfer learning to API-based inference.
+1. Accepts a crop image through an API endpoint.
+2. Preprocesses the image for MobileNetV2.
+3. Predicts one of six disease / damage categories.
+4. Returns the top-2 predictions with confidence scores.
+5. Adds symptom, damage, and solution information from a local JSON knowledge base.
+6. Optionally returns pesticide recommendations when the local pesticide dataset is available.
+
+## Model
+
+The project uses **MobileNetV2 transfer learning** with six output classes:
+
+- Bacterial_disease
+- Fungal_disease
+- Healthy
+- Pest_damage
+- Rust_disease
+- Viral_disease
+
+The API loads the trained weights from:
+
+~~~
+ml-model/saved_model/pest_model_v3.pth
+~~~
+
+Training uses image augmentation, including horizontal flips, rotations, grayscale conversion, color jitter, affine transforms, blur, and sharpness adjustment.
 
 ## System Flow
 
-```text
+~~~text
 Crop Image
     ↓
 Image Preprocessing
     ↓
-MobileNetV2 Transfer-Learning Model
+MobileNetV2
     ↓
 Disease / Damage Classification
     ↓
-Confidence & Top Predictions
+Top-2 Predictions + Confidence
     ↓
-Symptoms / Treatment Information
+Knowledge Base + Optional Pesticide Recommendations
     ↓
-FastAPI Response
-```
-
-## Highlights
-
-- Multi-category crop disease and pest-damage classification
-- Transfer learning with MobileNetV2
-- Fine-tuning on approximately 14K training images
-- Validation accuracy: **86.41%**
-- Image upload inference API
-- Confidence-aware predictions
-- Top-2 prediction output
-- Structured symptom, damage, and treatment information
-- FastAPI backend with Swagger/OpenAPI documentation
-- Data augmentation for more realistic image variation
-
-## Model Categories
-
-The current application works with categories including:
-
-- Healthy
-- Fungal Disease
-- Bacterial Disease
-- Viral Disease
-- Pest Damage
-- Rust Disease
-
-## Datasets
-
-Training used agricultural image datasets including PlantVillage and a multi-class crop-disease dataset.
-
-The repository does not reproduce third-party dataset ownership. Dataset acquisition instructions should be followed according to the original dataset licenses and terms.
-
-## Tech Stack
-
-| Component | Technology |
-|---|---|
-| Language | Python |
-| Deep learning | PyTorch |
-| Computer vision | TorchVision, PIL |
-| Model | MobileNetV2 |
-| Backend | FastAPI |
-| Server | Uvicorn |
-
-## Project Structure
-
-```text
-pest-detection-system/
-├── backend/
-│   ├── api/
-│   ├── services/
-│   ├── knowledge-base/
-│   └── main.py
-├── ml-model/
-│   ├── training/
-│   └── saved_model/
-├── PlantVillageDataset/
-├── plant-village-dataset/
-├── requirements.txt
-├── .gitignore
-└── README.md
-```
+FastAPI JSON Response
+~~~
 
 ## API
 
-### Predict Disease
+### Health / root
 
-```http
+GET /
+
+### Test route
+
+GET /test
+
+### Predict
+
 POST /predict
-```
 
-The inference endpoint accepts a crop image and returns the predicted category, confidence, top predictions, and supporting symptom/treatment information.
+The prediction endpoint accepts an image upload using the **file** form field.
 
-Example response shape:
+Example with curl:
 
-```json
-{
-  "filename": "leaf.jpg",
-  "prediction": {
-    "pest": "Viral_disease",
-    "confidence": 92.41,
-    "top_predictions": [
-      {"class": "Viral_disease", "confidence": 92.41},
-      {"class": "Rust_disease", "confidence": 5.82}
-    ]
-  }
-}
-```
+~~~bash
+curl -X POST "http://127.0.0.1:8000/predict" -F "file=@leaf.jpg"
+~~~
 
-## Engineering Focus
+FastAPI also exposes interactive API documentation at /docs.
 
-This project demonstrates:
+## Setup
 
-- Transfer learning and fine-tuning
-- Image augmentation
-- Model inference packaging
-- Confidence-aware prediction
-- Serving a deep-learning model through a REST API
-- Separation of model, backend, and knowledge-base components
+### 1. Create an environment
+
+~~~bash
+python -m venv .venv
+~~~
+
+Windows:
+
+~~~powershell
+.\.venv\Scripts\Activate.ps1
+~~~
+
+### 2. Install dependencies
+
+~~~bash
+pip install -r requirements.txt
+~~~
+
+### 3. Start the API
+
+From the repository root:
+
+~~~bash
+cd backend
+uvicorn main:app --reload
+~~~
+
+The API will be available at http://127.0.0.1:8000.
+
+## Project Structure
+
+~~~text
+pest-detection-system/
+├── backend/
+│   ├── api/
+│   │   └── routes.py
+│   ├── services/
+│   │   ├── knowledge_base.py
+│   │   ├── model_loader.py
+│   │   ├── pesticide_recommender.py
+│   │   └── predictor.py
+│   ├── utils/
+│   │   └── image_processing.py
+│   └── main.py
+├── knowledge-base/
+│   └── pests.json
+├── ml-model/
+│   ├── saved_model/
+│   │   └── pest_model_v3.pth
+│   └── training/
+│       ├── prepare_data_v2.py
+│       ├── train.py
+│       └── train_v2.py
+├── requirements.txt
+├── .gitignore
+└── README.md
+~~~
+
+## Training
+
+The active training pipeline is in ml-model/training/train_v2.py. It expects prepared training and validation data under:
+
+~~~text
+data/
+└── cleaned_v2/
+    ├── train/
+    └── val/
+~~~
+
+The dataset itself is not included in this repository. prepare_data_v2.py can reorganize the referenced crop-disease dataset into the expected class structure.
+
+The repository includes the trained pest_model_v3.pth artifact so the API can be run without retraining.
+
+## Engineering Highlights
+
+- PyTorch transfer learning with MobileNetV2
+- Image augmentation for training
+- FastAPI model-serving API
+- Top-k confidence scoring
+- Local JSON knowledge base
+- Optional fuzzy pesticide lookup using pandas and TheFuzz
+- CPU/GPU device selection for inference
+- Separation of model, API, service, and training components
+
+## Limitations
+
+- The model is intended as a project prototype, not a replacement for agronomist diagnosis.
+- Real-world field images can differ substantially from curated training data.
+- Pesticide recommendations depend on the optional local pesticide dataset and should be validated against crop, pest, dosage, regulations, and local agricultural guidance.
+- Dataset files are intentionally not committed to the repository.
 
 ## Future Improvements
 
 - Grad-CAM explainability
-- Better out-of-distribution evaluation
+- Out-of-distribution and field-image evaluation
+- Better calibration of confidence scores
 - Object detection for localized symptoms
 - Mobile deployment
 - Multilingual farmer support
-- Real-world field-image evaluation
 
 ## Author
 
